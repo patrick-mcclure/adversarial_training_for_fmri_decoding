@@ -23,7 +23,7 @@ taskandyeshallperceive train \
 
 
 
-# Predict
+## Predict
 
 Below is a command-line call to predict the decoding targerts for fMRI beta volumes using a 3D CNN model. Explaination of the command line arguements are also below.
 
