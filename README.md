@@ -4,4 +4,4 @@ This repository contains the code used for the experiments reported in "Evaluati
 
 The synthetic data experiment code is in the "Synthetic" directory.
 
-The fMRI data code is in the "HCP" directory.
+The fMRI data experiment code is in the "HCP" directory.
