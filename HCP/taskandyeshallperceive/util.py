@@ -120,7 +120,6 @@ def csv_to_batches(csv, batch_size):
 
     return contents, batch_per_ep
 
-
 def get_loss(ae_outputs, gt_outputs, ae_inputs, ae_logstds):
     #abs loss
     recon_loss = tf.keras.backend.square(ae_outputs - gt_outputs)
@@ -128,3 +127,28 @@ def get_loss(ae_outputs, gt_outputs, ae_inputs, ae_logstds):
     total_loss = tf.keras.backend.mean(recon_loss / (2.0 * (tf.square(tf.exp(ae_logstds))+1e-8)) + ae_logstds)
     #total_loss = recon_loss
     return total_loss, baseline_loss
+
+def hessian_vector_product(ys, xs, v):
+    # Validate the input
+    length = len(xs)
+    if len(v) != length:
+        raise ValueError("xs and v must have the same length.")
+
+    # First backprop
+    grads = gradients(ys, xs)
+
+    # grads = xs
+
+    assert len(grads) == length
+
+    elemwise_products = [
+        math_ops.multiply(grad_elem, array_ops.stop_gradient(v_elem))
+        for grad_elem, v_elem in zip(grads, [v]) if grad_elem is not None
+  ]
+
+    # Second backprop  
+    grads_with_none = gradients(elemwise_products, xs)
+    return_grads = [
+        grad_elem if grad_elem is not None else tf.zeros_like(x) for x, grad_elem in zip(xs, grads_with_none)]
+  
+    return return_grads

@@ -25,18 +25,6 @@ def create_parser():
         dest="subparser_name", title="subcommands",
         description="valid subcommands")
 
-    cp = subparsers.add_parser('clean_csv', help="Create cleaned csv"
-     "containing files that can be opened with nibabel")
-    c = cp.add_argument_group('clean_csv arguments')
-    c.add_argument(
-        '--input-csv', required=True,
-        help="Path to CSV of features, labels for training.")
-    
-    c.add_argument(
-        '--output-csv', required=True,
-        help="Path to output CSV containing files that can be loaded by nibabel.")
-
-
     # Training subparser
     tp = subparsers.add_parser('train', help="Train models")
 
@@ -73,10 +61,13 @@ def create_parser():
         '-m', '--model-dir', help="Path to directory containing the model.")
     ###
     ppp.add_argument('--output-dir',required= False, help="Name of output directory.",default=None)
+    ppp.add_argument('--temperature',required= False, help="Softmax temperature.",default=1.0)
+    ppp.add_argument('--target',required= False, help="Name of output directory.",default=None)
+    ppp.add_argument('--n-samples',required= False, help="Number of SmoothGrad samples. A value of 1 does not apply SmoothGrad.",default=1)
+    ppp.add_argument('--noise-level',required= False, help="SmoothGrad noise level.",default=0.0)
     
     
     return p
-
 
 def parse_args(args):
     """Return namespace of arguments."""
@@ -86,7 +77,6 @@ def parse_args(args):
         parser.print_usage()
         parser.exit(1)
     return namespace
-
 
 def train(params):
     _train(
@@ -101,6 +91,10 @@ def predict(params):
         model_dir=params['model_dir'],
         input_csv=params['input_csv'],
         output_dir=params['output_dir'],
+        temperature=params['temperature']
+        target=params['target'],
+        n_samples=params['n_samples'],
+        noise_level=params['noise_level']
         )
 
 def main(args=None):
@@ -119,19 +113,6 @@ def main(args=None):
 
     if params['subparser_name'] == 'predict':
         predict(params=params)
-
-    if params['subparser_name'] == 'pval':
-        pval(params=params)
-
-    if params['subparser_name'] == 'csv_to_pvals':
-        csv_to_pvals(params=params)
-
-    if params['subparser_name'] == 'conform_csv':
-        conform_csv(params=params)
-
-    if params['subparser_name'] == 'clean_csv':
-        clean_csv(params['input_csv'], params['output_csv'])
-
 
 if __name__ == '__main__':
     main()
