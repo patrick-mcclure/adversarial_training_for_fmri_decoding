@@ -53,6 +53,6 @@ taskandyeshallperceive predict \
 - `--input-csv`: path to CSV file with a row for each input with the first column containing the file path to a beta volume nifti file, the secind column containing a subject ID, and the third column containing the numerical code for the decoding target. The file must have a header, although the column names can be arbitrary.
 - `--output-dir`: the directory in which to save prediction output files.
 - `--n-classes`: the number of classes being decoded.
-- `--target`: the numerical code for the decoding task for which you want to generate gradients. The default is "None", which will set the target to the correct target value for each example in the input CSV file.
-- `--n-samples`: the number of samples to use when generating SmoothGrad gradients. The default is "1", which will disable SmoothGrad.
+- `--target`: the numerical code for the decoding task for which you want to generate gradients. The default is `None`, which will set the target to the correct target value for each example in the input CSV file.
+- `--n-samples`: the number of samples to use when generating SmoothGrad gradients. The default is 1, which will disable SmoothGrad.
 - `--noise-level`: the noise level (i.e. standard devation) of the noise used when generating SmoothGrad gradients. The default is 0.0, which will disable SmoothGrad.
