@@ -25,7 +25,7 @@ taskandyeshallperceive train \
 
 ## Predict
 
-Below is a command-line call to predict the decoding targerts for fMRI beta volumes using a 3D CNN model. Explaination of the command line arguements are also below.
+Below is a command-line call to predict the decoding targets for fMRI beta volumes using a 3D CNN model and to generate input gradient maps for a given target. Explaination of the command line arguements are also below.
 
 ```
 taskandyeshallperceive predict \
