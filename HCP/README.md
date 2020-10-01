@@ -35,7 +35,7 @@ taskandyeshallperceive predict \
   --output-dir={outputdipath} \
   --target=0 \
   --n-samples=1\
-  --noise-level=0
+  --noise-level=0.0
 ```
 
 - `--model-dir`: the directory in which to save model checkpoints.
