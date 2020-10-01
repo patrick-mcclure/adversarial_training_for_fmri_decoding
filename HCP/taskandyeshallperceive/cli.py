@@ -50,9 +50,23 @@ def create_parser():
         help="Number of samples per batch. If `--multi-gpu` is specified,"
              " batch is split across available GPUs.")
     t.add_argument(
-        '-e', '--n-epochs', type=int, default=5,
+        '-e', '--n-epochs', required=True, type=int,
         help="Number of training epochs")
-
+    t.add_argument('--n-m', required=False, type=int, default=1,
+        help="Number m-step minibatch updates")
+    t.add_argument('--n-classes', required=True, type=int,
+        help="Number of classes")
+    t.add_argument('--model-type', required=True, type=str,
+        help='Type of model: "cnn" or "linear"')
+    t.add_argument('--epsilon', required=False, type=float,
+        help="Adversarial training noise epsilon",default=0.95)
+    t.add_argument('--l2-coeff', required=False, type=float,
+        help="Adversarial training noise epsilon",default=1e-9)
+    t.add_argument('--n-gpus', required=True, type=int,
+        help="Adversarial training noise epsilon")
+    t.add_argument('--radius', required=False, type=float,
+        help="Radius of spherical random noise. The default is 0.0, which disables the noise.",default=0.0)    
+    
     # Prediction subparser
     pp = subparsers.add_parser('predict', help="Predict using SavedModel")
     pp.add_argument('--input-csv',required=True, help="Filepath to csv containing scan paths.")
@@ -64,7 +78,12 @@ def create_parser():
     ppp.add_argument('--temperature',required= False, help="Softmax temperature.",default=1.0)
     ppp.add_argument('--target',required= False, help="Name of output directory.",default=None)
     ppp.add_argument('--n-samples',required= False, help="Number of SmoothGrad samples. A value of 1 does not apply SmoothGrad.",default=1)
-    ppp.add_argument('--noise-level',required= False, help="SmoothGrad noise level.",default=0.0)
+    ppp.add_argument('--noise-level', type=float, help="SmoothGrad noise level.",default=0.0)
+    ppp.add_argument('--n-classes', type=int,
+        help="Number classes")
+    ppp.add_argument('--model-type', required=True, type=str,
+        help='Type of model: "cnn" or "linear"')
+
     
     
     return p
@@ -81,18 +100,27 @@ def parse_args(args):
 def train(params):
     _train(
         model_dir=params['model_dir'],
+        model_type=params['model_type'],
         input_csv=params['input_csv'],
+        n_classes=params['n_classes'],
+        n_m=params['n_m'],
         batch_size=params['batch_size'],
         n_epochs=params['n_epochs'],
+        epsilon=params['epsilon'],
+        l2_coeff=params['l2_coeff'],
+        n_gpus=params['n_gpus'],
+        radius=params['radius']
         )
-
+    
 def predict(params):
     _predict(
         model_dir=params['model_dir'],
+        model_type=params['model_type'],
         input_csv=params['input_csv'],
+        n_classes=params['n_classes'],
         output_dir=params['output_dir'],
         temperature=params['temperature']
-        target=params['target'],
+        target_task=params['target'],
         n_samples=params['n_samples'],
         noise_level=params['noise_level']
         )

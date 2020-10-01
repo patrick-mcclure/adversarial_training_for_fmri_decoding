@@ -19,7 +19,7 @@ from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import math_ops
 from tensorflow import gradients
 
-def predict(model_dir,model_type,input_csv,output_dir,temperature,target_task,n_samples,noise_level):
+def predict(model_dir,model_type,input_csv,n_classes,output_dir,temperature,target_task,n_samples,noise_level):
     lr = 1e-3
     batch_size=1
     hessian_flg = False
@@ -52,7 +52,11 @@ def predict(model_dir,model_type,input_csv,output_dir,temperature,target_task,n_
     
     y_true = tf.placeholder(tf.int64, (batch_size))
     
-    y_logits = predictor(x,training=True) * (1.0/temperature) 
+    if model_type == 'cnn':
+        y_logits = predictor(x,training=True)
+    elif model_type == 'linear':
+        y_logits = linear(x,training=True)
+    y_logits *= (1.0/temperature) 
     
     loss = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=y_true, logits=y_logits)
     

@@ -18,12 +18,6 @@ import os
 from keras_radam.training import RAdamOptimizer
 # from delorean.util import zscore
 
-model_type = 'nn'
-n_gpus = 8
-epsilon = 0.95 #9.5 #95
-l2_coeff = 1e-9
-sphere = True
-
 def get_noise(shape,epsilon):
     n_noise_samples = shape[0]
     shape.pop(0)
@@ -50,14 +44,12 @@ def make_parallel(fn, num_gpus,batch_size,epsilon, **kwargs):
 
 def model(x,y_true,mask_true):
     
-    if model_type == 'nn':
+    if model_type == 'cnn':
         y_logits = predictor(x,training=True)
     elif model_type == 'linear':
         y_logits = linear(x,training=True)
-    elif model_type == 'cln':
-        y_logits = cln(x,training=True)
     loss = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=y_true, logits=y_logits)
-    if model_type == 'nn':
+    if model_type == 'cnn':
         kernels = tf.get_collection('kernels')
         ss_l2 = 0.0
         for kernel in kernels:
@@ -71,7 +63,7 @@ def model(x,y_true,mask_true):
     tf.add_to_collection('total_acc', acc)
     tf.add_to_collection('total_grad', grad)
 
-def train(model_dir,input_csv,batch_size,n_epochs):
+def train(model_dir,model_type,input_csv,n_classes,n_m,batch_size,n_epochs,epsilon,l2_coeff,n_gpus,radius):
     lr = 1e-3
     contents, batch_per_ep = csv_to_batches(input_csv, batch_size)
     
@@ -97,12 +89,10 @@ def train(model_dir,input_csv,batch_size,n_epochs):
     # initialize the network
     init = tf.global_variables_initializer()
     
-    if model_type == 'nn':
+    if model_type == 'cnn':
         pred_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES,scope="predictor")
     elif model_type == 'linear':
         pred_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES,scope="linear")
-    elif model_type == 'cln':
-        pred_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES,scope="cln")
     print(pred_vars)
     saver = tf.train.Saver(pred_vars)
     config = tf.ConfigProto(allow_soft_placement=True)
@@ -111,9 +101,8 @@ def train(model_dir,input_csv,batch_size,n_epochs):
     with tf.Session(config=config) as sess:
 
         sess.run(init)
-        n_m = 0
         t = 0
-        if n_m ==0:
+        if n_m <=1:
             n_ep = n_epochs
         else:
             n_ep = round(float(n_epochs)/float(n_m))
@@ -129,17 +118,17 @@ def train(model_dir,input_csv,batch_size,n_epochs):
                 time1 = time.time()
                 batch_x, batch_y_true = get_batch(batch)
                 noise = np.zeros((batch_size, 91, 109, 91, 1))
-                if sphere:
+                if radius>0.0:
                     noise_sphere = get_noise([batch_size, 91, 109, 91, 1],epsilon)
-                if n_m == 0:
-                    if sphere:
+                if n_m == 1:
+                    if radius>0.0:
                         batch_x += noise_sphere
                     _, l, a = sess.run([train_gen, total_loss_collection, total_acc_collection], feed_dict={x: batch_x, y_true: batch_y_true})
                     print('Epoch: {} - loss = {:.5f} - accuracy = {:.5f}'.format((ep + 1), l[0], a))
                 
                 else:
                     for m in range(n_m):
-                        if sphere:
+                        if radius>0.0:
                             batch_x += noise_sphere
                         _, l, a = sess.run([train_gen, total_loss_collection, total_acc_collection], feed_dict={x: batch_x+noise, y_true: batch_y_true})
                         g = sess.run(total_grad_collection, feed_dict={x: batch_x+noise, y_true: batch_y_true})
