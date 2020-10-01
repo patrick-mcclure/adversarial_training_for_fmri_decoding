@@ -44,7 +44,7 @@ taskandyeshallperceive predict \
   --n-classes=7 \
   --output-dir={outputdipath} \
   --target=0 \
-  --n-samples=1\
+  --n-samples=1 \
   --noise-level=0.0
 ```
 
