@@ -1,4 +1,4 @@
-# Adversarial Training for fMRI Decoding
+# Adversarial Training for fMRI Decoding from Beta Volumes
 
 ## Train
 
