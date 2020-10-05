@@ -27,7 +27,7 @@ taskandyeshallperceive train \
 - `--batch-size`: the number of input examples per batch.
 - `--n-epochs`: the number of input examples per batch.
 - `--epsilon`: the adversarial noise epsilon. The default value is 0.95.
-- `--l2_coeff`: the L2 regularization coefficient. The default value is 1e-9.
+- `--l2-coeff`: the L2 regularization coefficient. The default value is 1e-9.
 - `--n-gpus`: the number of GPUs being used. The batch-size must be divisible by this number.
 - `--radius`: the radius of the random spherical noise. The default value is 0.0, which disables the spherical noise.
 
