@@ -44,17 +44,17 @@ def make_parallel(fn, num_gpus,batch_size,epsilon, **kwargs):
 
 def model(x,y_true,mask_true):
     
-    if model_type == 'cnn':
+    if model_type_g == 'cnn':
         y_logits = predictor(x,training=True)
-    elif model_type == 'linear':
+    elif model_type_g == 'linear':
         y_logits = linear(x,training=True)
     loss = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=y_true, logits=y_logits)
-    if model_type == 'cnn':
+    if model_type_g == 'cnn':
         kernels = tf.get_collection('kernels')
         ss_l2 = 0.0
         for kernel in kernels:
             ss_l2 += tf.reduce_sum(tf.square(kernel))
-        loss += l2_coeff * tf.sqrt(ss_l2)
+        loss += l2_coeff_g * tf.sqrt(ss_l2)
     acc = tf.reduce_mean(tf.dtypes.cast(tf.equal(y_true,tf.argmax(y_logits, 1)),tf.float32))
     masked_loss = tf.reduce_mean(tf.nn.softmax(y_logits) * mask_true,axis = -1)
     grad = tf.gradients(masked_loss,x)
@@ -66,6 +66,10 @@ def model(x,y_true,mask_true):
 def train(model_dir,model_type,input_csv,n_classes,n_m,batch_size,n_epochs,epsilon,l2_coeff,n_gpus,radius):
     lr = 1e-3
     contents, batch_per_ep = csv_to_batches(input_csv, batch_size)
+    global model_type_g
+    model_type_g = model_type
+    global l2_coeff_g
+    l2_coeff_g = l2_coeff
     
     with tf.device(tf.DeviceSpec(device_type="CPU", device_index=0)):
         

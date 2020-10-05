@@ -23,7 +23,7 @@ def predict(model_dir,model_type,input_csv,n_classes,output_dir,temperature,targ
     lr = 1e-3
     batch_size=1
     hessian_flg = False
-    
+    n_samples = int(n_samples)
     # The CNNs used a temperature of 1.0 and the linear model used a temperature of 100.0
     # A SmoothGrad noise level of 2.0 was used.
     
@@ -47,16 +47,15 @@ def predict(model_dir,model_type,input_csv,n_classes,output_dir,temperature,targ
     
     
     x = tf.placeholder(tf.float32, (batch_size, 91, 109, 91, 1))
-    
-    v = tf.placeholder(tf.float32, (len(brain_parcels)-1, batch_size, 91, 109, 91, 1))
+    if hessian_flg:
+        v = tf.placeholder(tf.float32, (len(brain_parcels)-1, batch_size, 91, 109, 91, 1))
     
     y_true = tf.placeholder(tf.int64, (batch_size))
     
     if model_type == 'cnn':
-        y_logits = predictor(x,training=True)
+        y_logits = predictor(x,training=True) * (1.0/temperature)
     elif model_type == 'linear':
-        y_logits = linear(x,training=True)
-    y_logits *= (1.0/temperature) 
+        y_logits = linear(x,training=True) * (1.0/temperature)
     
     loss = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=y_true, logits=y_logits)
     
@@ -88,7 +87,8 @@ def predict(model_dir,model_type,input_csv,n_classes,output_dir,temperature,targ
         saver.restore(sess, model_dir + "/model.ckpt")
         
         batches = [contents[i:i + batch_size] for i in range(0, len(contents), batch_size) if batch_size == len(contents[i:i + batch_size])]
-        roi_masks = np.array(roi_masks)
+        if hessian_flg:
+            roi_masks = np.array(roi_masks)
         n=1
         a_sum=0
         l_sum=0
@@ -132,7 +132,7 @@ def predict(model_dir,model_type,input_csv,n_classes,output_dir,temperature,targ
             n += 1 
             
             orig_img = nib.load(batch[0][0])
-            img_data = np.zeros(brain_atlas.shape)
+            img_data = np.zeros(orig_img.get_data().shape)
             
             output_img = nib.spatialimages.SpatialImage(
                 dataobj=g_sum.squeeze(), affine=orig_img.affine, header=orig_img.header, extra=orig_img.extra)

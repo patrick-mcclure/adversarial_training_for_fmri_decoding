@@ -98,6 +98,7 @@ def parse_args(args):
     return namespace
 
 def train(params):
+    print(params['model_type'])
     _train(
         model_dir=params['model_dir'],
         model_type=params['model_type'],
@@ -119,7 +120,7 @@ def predict(params):
         input_csv=params['input_csv'],
         n_classes=params['n_classes'],
         output_dir=params['output_dir'],
-        temperature=params['temperature']
+        temperature=params['temperature'],
         target_task=params['target'],
         n_samples=params['n_samples'],
         noise_level=params['noise_level']
