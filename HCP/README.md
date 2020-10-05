@@ -1,5 +1,9 @@
 # Adversarial Training for fMRI Decoding from Beta Volumes
 
+## Setup
+
+`python setup.py install`
+
 ## Train
 
 Below is a command-line call to train a 3D convolutional neural netwok (CNN) model to perform multinomial decoding of fMRI beta volumes. Explaination of the command line arguements are also below.
