@@ -14,7 +14,7 @@ taskandyeshallperceive train \
   --batch-size=8 \
   --n-epochs=50 \
   --epsilon=0.95 \
-  --l2_coeff=1e-9 \
+  --l2-coeff=1e-9 \
   --n-gpus=8 \
   --radius=0.0
 ```
