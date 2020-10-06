@@ -55,7 +55,7 @@ def predict(model_dir,model_type,input_csv,n_classes,output_dir,temperature,targ
     if model_type == 'cnn':
         y_logits = predictor(x,training=True) * (1.0/temperature)
     elif model_type == 'linear':
-        y_logits = linear(x,training=True) * (1.0/temperature)
+        y_logits = linear(x,0.0,training=True) * (1.0/temperature)
     
     loss = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=y_true, logits=y_logits)
     
