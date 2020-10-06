@@ -25,7 +25,7 @@ taskandyeshallperceive train \
 
 - `--model-dir`: the directory in which to save model checkpoints.
 - `--model-type`: the type of model being trained. This should be either 'cnn' or 'linear'.
-- `--input-csv`: path to CSV file with a row for each input with the first column containing the file path to a beta volume nifti file, the secind column containing a subject ID, and the third column containing the numerical code for the decoding target. The file must have a header, although the column names can be arbitrary.
+- `--input-csv`: path to CSV file with a row for each input with the first column containing the file path to a beta volume nifti file, the second column containing a subject ID, and the third column containing the numerical code for the decoding target. The file must have a header, although the column names can be arbitrary.
 - `--n-classes`: the number of classes being decoded.
 - `--n-m`: the number of adversarial training steps to take for each batch. The default is 1, which will disable adversarial training.
 - `--batch-size`: the number of input examples per batch.
