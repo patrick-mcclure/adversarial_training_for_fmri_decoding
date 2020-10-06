@@ -47,7 +47,7 @@ def model(x,y_true,mask_true):
     if model_type_g == 'cnn':
         y_logits = predictor(x,training=True)
     elif model_type_g == 'linear':
-        y_logits = linear(x,training=True)
+        y_logits = linear(x,l2_coeff_g,training=True)
     loss = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=y_true, logits=y_logits)
     if model_type_g == 'cnn':
         kernels = tf.get_collection('kernels')
