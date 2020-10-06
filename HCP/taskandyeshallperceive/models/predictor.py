@@ -47,9 +47,10 @@ def cln(inputs,training):
         print(y.get_shape().as_list())
         return y
     
-def linear(inputs,training):
+def linear(inputs,l2_coeff,training):
     with tf.variable_scope('linear',reuse=tf.AUTO_REUSE):
         # image is 256 x 256 x input_c_dim
+        # l2_coeff = 1e-7
         inputs_f = tf.contrib.layers.flatten(inputs)
-        y = tf.contrib.layers.fully_connected(inputs_f,7,weights_regularizer=tf.keras.regularizers.l2(l=1e-7),activation_fn=None,reuse=tf.AUTO_REUSE,scope='l1')
+        y = tf.contrib.layers.fully_connected(inputs_f,7,weights_regularizer=tf.keras.regularizers.l2(l=l2_coeff),activation_fn=None,reuse=tf.AUTO_REUSE,scope='l1')
         return y
