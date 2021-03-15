@@ -142,7 +142,7 @@ def train(model_dir,model_type,input_csv,n_classes,n_m,batch_size,n_epochs,epsil
                         for k in range(g.shape[0]):
                             random_epsilon = np.random.uniform(0,epsilon,())
                             if np.linalg.norm(g[k]) != 0:
-                                noise[k] -= epsilon * g[k] / np.linalg.norm(g[k])
+                                noise[k] -= random_epsilon * g[k] / np.linalg.norm(g[k])
                             noise_norm = np.linalg.norm(noise[k])
                             if noise_norm > float(epsilon):
                                 noise[k] = epsilon * noise[k] / noise_norm
