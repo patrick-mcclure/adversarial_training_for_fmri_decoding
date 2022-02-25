@@ -6,7 +6,7 @@ import numpy as np
 import time
 import pandas as pd
 from pathlib import Path
-from taskandyeshallperceive.models.predictor import predictor, linear, cln
+from taskandyeshallperceive.models.predictor import predictor, linear, structured_linear
 from taskandyeshallperceive.util import get_batch,get_loss,csv_to_batches,zscore,hessian_vector_product
 from random import shuffle,seed
 from scipy.io import mmread
@@ -24,6 +24,7 @@ def predict(model_dir,model_type,input_csv,n_classes,output_dir,temperature,targ
     batch_size=1
     hessian_flg = False
     n_samples = int(n_samples)
+    temperature = float(temperature)
     # The CNNs used a temperature of 1.0 and the linear model used a temperature of 100.0
     # A SmoothGrad noise level of 2.0 was used.
     
@@ -54,6 +55,9 @@ def predict(model_dir,model_type,input_csv,n_classes,output_dir,temperature,targ
     
     if model_type == 'cnn':
         y_logits = predictor(x,training=True) * (1.0/temperature)
+    elif model_type == 'structured_linear':
+        print('Help!')
+        y_logits = structured_linear(x,training=True) * (1.0/temperature)
     elif model_type == 'linear':
         y_logits = linear(x,0.0,training=True) * (1.0/temperature)
     
@@ -111,16 +115,17 @@ def predict(model_dir,model_type,input_csv,n_classes,output_dir,temperature,targ
             
             g_sum = g_sum[0]
             
-            for k in range(n_samples-1):
+            for k in range(n_samples):
                 batch_x_tmp = batch_x + np.random.normal(loc=0.0, scale=noise_level, size=batch_x.shape)
                 if target_task == None:
                     if hessian_flg:
                         g_tmp, h_tmp = sess.run([g, h], feed_dict={x: batch_x_tmp, y_true: batch_y_true, v:roi_masks})
                         h_sum += np.array(h_tmp)
                     else:
-                        g_tmp = sess.run(g, feed_dict={x: batch_x_tmp, y_true: batch_y_true, v:roi_masks})
+                        g_tmp = sess.run(g, feed_dict={x: batch_x_tmp, y_true: batch_y_true})
                 else:
                     g_tmp, pr = sess.run([g,probs], feed_dict={x: batch_x_tmp, y_true: batch_y_true})
+                    print(g_tmp[0].shape)
                 g_sum += g_tmp[0]
                 
             g_sum /= float(n_samples)
@@ -134,13 +139,15 @@ def predict(model_dir,model_type,input_csv,n_classes,output_dir,temperature,targ
             orig_img = nib.load(batch[0][0])
             img_data = np.zeros(orig_img.get_data().shape)
             
+            print(g_sum.shape)
+            
             output_img = nib.spatialimages.SpatialImage(
                 dataobj=g_sum.squeeze(), affine=orig_img.affine, header=orig_img.header, extra=orig_img.extra)
             
             print(contents[ii][0].split('/')[-1])
             
             if target_task == None:
-                nib.save(output_img,output_dir + "grads_" + contents[ii][0].split('/')[-1])
+                #nib.save(output_img,output_dir + "grads_" + contents[ii][0].split('/')[-1])
                 if hessian_flg:
                     p.save(output_dir + "hessian_" + contents[ii][0].split('/')[-1].replace('.nii.gz','.npy'),h_sum)
             else:

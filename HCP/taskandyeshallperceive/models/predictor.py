@@ -37,13 +37,21 @@ def predictor(inputs,training):
         print(y.get_shape().as_list())
         return y
     
-def cln(inputs,training):
-    with tf.variable_scope('cln',reuse=tf.AUTO_REUSE):
-        # image is 256 x 256 x input_c_dim
-        c = 1e-7
-        inputs_f = tf.contrib.layers.flatten(inputs)
-        h_f = tf.contrib.layers.fully_connected(inputs_f,75,activation_fn=None,weights_regularizer=tf.keras.regularizers.l2(l=c),reuse=tf.AUTO_REUSE,scope='fc1')
-        y = tf.contrib.layers.fully_connected(h_f,7,activation_fn=None,weights_regularizer=tf.keras.regularizers.l2(l=c),reuse=tf.AUTO_REUSE,scope='fc2')
+def structured_linear(inputs,training):
+    with tf.variable_scope('structured_linear',reuse=tf.AUTO_REUSE):
+        h1 = pool(conv3d(inputs,32,name='c3d1'))
+        print(h1.get_shape().as_list())
+        h2 = pool(conv3d(h1,32,name='c3d2'))
+        print(h2.get_shape().as_list())
+        h3 = pool(conv3d(h2,64,name='c3d3'))
+        print(h3.get_shape().as_list())
+        h4 = pool(conv3d(h3,64,name='c3d4'))
+        print(h4.get_shape().as_list())
+        h5 = pool(conv3d(h3,64,name='c3d5'))
+        print(h5.get_shape().as_list())
+        h5_f = tf.contrib.layers.flatten(h5)
+        print(h5_f.get_shape().as_list())
+        y = tf.contrib.layers.fully_connected(h5_f,7,activation_fn=None,reuse=tf.AUTO_REUSE,scope='f1d1')
         print(y.get_shape().as_list())
         return y
     

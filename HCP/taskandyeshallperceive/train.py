@@ -7,7 +7,7 @@ import time
 import pandas as pd
 from random import uniform
 from pathlib import Path
-from taskandyeshallperceive.models.predictor import predictor, linear, cln
+from taskandyeshallperceive.models.predictor import predictor, linear, structured_linear
 from taskandyeshallperceive.util import get_batch,csv_to_batches,zscore
 from random import shuffle,seed
 from scipy.io import mmread
@@ -46,6 +46,8 @@ def model(x,y_true,mask_true):
     
     if model_type_g == 'cnn':
         y_logits = predictor(x,training=True)
+    elif model_type_g == 'structured_linear':
+        y_logits = structured_linear(x,training=True)   
     elif model_type_g == 'linear':
         y_logits = linear(x,l2_coeff_g,training=True)
     loss = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=y_true, logits=y_logits)
@@ -95,6 +97,8 @@ def train(model_dir,model_type,input_csv,n_classes,n_m,batch_size,n_epochs,epsil
     
     if model_type == 'cnn':
         pred_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES,scope="predictor")
+    elif model_type == 'structured_linear':
+        pred_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES,scope="structured_linear")
     elif model_type == 'linear':
         pred_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES,scope="linear")
     print(pred_vars)

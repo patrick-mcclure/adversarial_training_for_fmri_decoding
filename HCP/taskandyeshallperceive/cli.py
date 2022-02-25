@@ -57,11 +57,11 @@ def create_parser():
     t.add_argument('--n-classes', required=True, type=int,
         help="Number of classes")
     t.add_argument('--model-type', required=True, type=str,
-        help='Type of model: "cnn" or "linear"')
+        help='Type of model: "cnn", "linear", or "structured_linear"')
     t.add_argument('--epsilon', required=False, type=float,
-        help="Adversarial training noise epsilon",default=0.95)
+        help="Adversarial training noise epsilon",default=95.)
     t.add_argument('--l2-coeff', required=False, type=float,
-        help="Adversarial training noise epsilon",default=1e-9)
+        help="L2 regularization coefficient",default=1e-9)
     t.add_argument('--n-gpus', required=True, type=int,
         help="Adversarial training noise epsilon")
     t.add_argument('--radius', required=False, type=float,
