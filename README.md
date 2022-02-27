@@ -14,3 +14,4 @@ The results indicate that, for real-world fMRI data, using non-linear models, de
 
 ![Optional Text](Figure_8.png)
 
+Please contact the corresponding author of the paper, Patrick McClure, with any questions at patrick [dot] s [dot] mcclure [at] gmail [dot] com.
